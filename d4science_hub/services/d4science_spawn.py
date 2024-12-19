@@ -15,6 +15,9 @@ from tornado.web import Application, RequestHandler, authenticated
 
 
 class D4ScienceHandler(HubOAuthenticated, RequestHandler):
+    """Simple handler that redirects to the right spawn page
+    for the user depending of the request"""
+
     @authenticated
     def get(self):
         user = self.get_current_user()
