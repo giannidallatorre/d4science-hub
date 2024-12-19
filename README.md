@@ -1,7 +1,6 @@
-# EGI Notebooks Hub
+# D4Science Hub
 
-Jupyterhub with some adjustments to make it EGI friendly:
+Jupyterhub with some adjustments to make it work with D4Science:
 
-- EGI Check-in authenticator
-- EGI Spawner
-- EGI DataHub integration
+- D4Science authenticator
+- D4Science spawner
