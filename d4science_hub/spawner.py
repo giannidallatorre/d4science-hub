@@ -116,6 +116,17 @@ class D4ScienceSpawner(KubeSpawner):
         config=True,
         help="""If provided, override image repository with this value""",
     )
+    gpu_override = Dict(
+        {
+            "node_selector": {
+                "cloud.google.com/gke-nodepool": "d4science-test-vre-gke-nodepool2"
+            },
+            "extra_resource_guarantees": {"nvidia.com/gpu": "1"},
+            "extra_resource_limits": {"nvidia.com/gpu": "3"},
+        },
+        config=True,
+        help="""Configuration to add for GPU servers""",
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -254,6 +265,8 @@ class D4ScienceSpawner(KubeSpawner):
                         )
                         cut_info.append(f"{override['mem_limit']} RAM")
                     name += " - %s" % " / ".join(cut_info)
+                if p.get("@gpu", {}) == "true":
+                    override.update(self.gpu_override)
                 profile = {
                     "display_name": name,
                     "description": p.get("Info", {}).get("Description", ""),
