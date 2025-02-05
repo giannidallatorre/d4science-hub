@@ -9,12 +9,11 @@ from urllib.parse import quote_plus, unquote, urlencode
 import jwt
 import xmltodict
 from jupyterhub.utils import url_path_join
-from kubespawner import KubeSpawner
 from oauthenticator.generic import GenericOAuthenticator
 from oauthenticator.oauth2 import OAuthLoginHandler
 from tornado import web
 from tornado.httpclient import AsyncHTTPClient, HTTPError, HTTPRequest
-from traitlets import Bool, Dict, List, Unicode
+from traitlets import Unicode
 
 D4SCIENCE_REGISTRY_BASE_URL = os.environ.get(
     "D4SCIENCE_REGISTRY_BASE_URL",
@@ -38,6 +37,7 @@ D4SCIENCE_DISCOVER_WPS = os.environ.get(
 
 
 class D4ScienceContextHandler(OAuthLoginHandler):
+    """ manages the params for the authenticator """
     def get(self):
         context = self.get_argument("context", None)
         namespace = self.get_argument("namespace", None)

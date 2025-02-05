@@ -1,19 +1,7 @@
 """D4Science Authenticator for JupyterHub
 """
 
-import base64
-import json
-import os
-from urllib.parse import quote_plus, unquote, urlencode
-
-import jwt
-import xmltodict
-from jupyterhub.utils import url_path_join
 from kubespawner import KubeSpawner
-from oauthenticator.generic import GenericOAuthenticator
-from oauthenticator.oauth2 import OAuthLoginHandler
-from tornado import web
-from tornado.httpclient import AsyncHTTPClient, HTTPError, HTTPRequest
 from traitlets import Bool, Dict, List, Unicode
 
 
