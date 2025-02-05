@@ -37,7 +37,8 @@ D4SCIENCE_DISCOVER_WPS = os.environ.get(
 
 
 class D4ScienceContextHandler(OAuthLoginHandler):
-    """ manages the params for the authenticator """
+    """manages the params for the authenticator"""
+
     def get(self):
         context = self.get_argument("context", None)
         namespace = self.get_argument("namespace", None)
