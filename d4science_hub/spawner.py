@@ -109,8 +109,8 @@ class D4ScienceSpawner(KubeSpawner):
             "node_selector": {
                 "cloud.google.com/gke-nodepool": "d4science-test-vre-gke-nodepool2"
             },
-            "extra_resource_guarantees": {"nvidia.com/gpu": "1"},
-            "extra_resource_limits": {"nvidia.com/gpu": "3"},
+            "extra_resource_guarantees": {"nvidia.com/gpu": 1},
+            "extra_resource_limits": {"nvidia.com/gpu": 1},
         },
         config=True,
         help="""Configuration to add for GPU servers""",
