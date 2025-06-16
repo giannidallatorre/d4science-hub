@@ -48,7 +48,12 @@ class D4ScienceSpawner(KubeSpawner):
             """,
     )
     server_options_names = List(
-        ["ServerOption", "RStudioServerOption", "WITOILServerOption"],
+        [
+            "ServerOption",
+            "RStudioServerOption",
+            "WITOILServerOption",
+            "webODVServerOption",
+        ],
         config=True,
         help="""Name of ServerOptions to consider from the D4Science Information
                 System. These can be then used for filtering with named servers""",
