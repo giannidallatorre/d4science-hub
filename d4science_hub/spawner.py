@@ -107,7 +107,6 @@ class D4ScienceSpawner(KubeSpawner):
         """,
     )
 
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.allowed_profiles = []
@@ -137,7 +136,7 @@ class D4ScienceSpawner(KubeSpawner):
         return name.strip().lower().replace(" ", "-")
 
     def build_resource_options(self, roles, resources):
-        server_options = {}
+        server_options = []
         volume_options = {}
         try:
             resource_list = resources["genericResources"]["Resource"]
@@ -156,10 +155,9 @@ class D4ScienceSpawner(KubeSpawner):
                         continue
                     name = profile.get("Name", "")
                     if name in self.server_options_names:
-                        server_options[p["ServerOption"]["AuthId"]] = p["ServerOption"]
-                        server_options[p["ServerOption"]["AuthId"]].update(
-                            {"server_option_name": name}
-                        )
+                        option = p["ServerOption"]
+                        option.update({"server_option_name": name})
+                        server_options.append(option)
                 elif p.get("VolumeOption", None):
                     volume_options[p["VolumeOption"]["Name"]] = p["VolumeOption"][
                         "Permission"
@@ -223,9 +221,9 @@ class D4ScienceSpawner(KubeSpawner):
         )
 
         if self.allowed_profiles and self.server_options:
-            for allowed in self.allowed_profiles:
-                p = self.server_options.get(allowed, None)
-                if not p:
+            for p in self.server_options:
+                auth_id = p.get("AuthId", "")
+                if auth_id not in self.allowed_profiles:
                     continue
                 override = {}
                 name = p.get("Info", {}).get("Name", "")
@@ -261,7 +259,7 @@ class D4ScienceSpawner(KubeSpawner):
                 profile = {
                     "display_name": name,
                     "description": p.get("Info", {}).get("Description", ""),
-                    "slug": p.get("AuthId", ""),
+                    "slug": auth_id,
                     "kubespawner_override": override,
                     "default": p.get("@default", {}) == "true",
                 }

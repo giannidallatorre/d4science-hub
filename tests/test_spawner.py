@@ -32,12 +32,12 @@ async def test_build_options_role():
     }
     # role of user and resource matches
     server_opts, vol_opts = spawner.build_resource_options(roles, resources)
-    assert "witoil-authid" in server_opts.keys()
+    assert "witoil-authid" in [s.get("AuthId", "") for s in server_opts]
     assert vol_opts == {}
 
     # role of user and resource does not match
     server_opts, vol_opts = spawner.build_resource_options([], resources)
-    assert "witoil-authid" not in server_opts.keys()
+    assert "witoil-authid" not in [s.get("AuthId", "") for s in server_opts]
     assert vol_opts == {}
 
     # no role in the resource
@@ -45,5 +45,5 @@ async def test_build_options_role():
         "@role"
     ]
     server_opts, vol_opts = spawner.build_resource_options([], resources)
-    assert "witoil-authid" in server_opts.keys()
+    assert "witoil-authid" in [s.get("AuthId", "") for s in server_opts]
     assert vol_opts == {}
