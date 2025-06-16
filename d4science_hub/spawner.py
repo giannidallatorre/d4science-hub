@@ -1,7 +1,8 @@
 """D4Science Authenticator for JupyterHub"""
 
+from jupyterhub.utils import maybe_future
 from kubespawner import KubeSpawner
-from traitlets import Bool, Dict, List, Unicode
+from traitlets import Bool, Callable, Dict, List, Unicode
 
 
 class D4ScienceSpawner(KubeSpawner):
@@ -89,6 +90,23 @@ class D4ScienceSpawner(KubeSpawner):
         config=True,
         help="""Configuration to add for GPU servers""",
     )
+    custom_user_options = Callable(
+        None,
+        allow_none=True,
+        config=True,
+        help="""
+        Callable to add extra configuration for the spawner during the
+        load_user_options, which is called just at the begginig of the
+        start() method.
+
+        Expects a callable that takes one parameter: The spawner object that
+        is doing the spawning
+
+        This can be a coroutine if necessary. When set to none, no extra
+        configruation is done.
+        """,
+    )
+
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -283,6 +301,12 @@ class D4ScienceSpawner(KubeSpawner):
             spawner.extra_containers.append(sidecar)
         else:
             spawner.container_security_context = self.workspace_security_context
+
+    async def load_user_options(self):
+        await super().load_user_options()
+        if self.custom_user_options:
+            self.log.info("Calling custom_user_options")
+            await maybe_future(self.custom_user_options(self))
 
     async def pre_spawn_hook(self, spawner):
         context = spawner.environment.get("D4SCIENCE_CONTEXT", "")
