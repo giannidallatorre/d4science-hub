@@ -1,7 +1,10 @@
 """Tests for the spawner"""
 
+from unittest.mock import MagicMock
+
 import pytest
 from d4science_hub.spawner import D4ScienceSpawner
+
 
 
 @pytest.mark.asyncio
@@ -47,3 +50,12 @@ async def test_build_options_role():
     server_opts, vol_opts = spawner.build_resource_options([], resources)
     assert "witoil-authid" in [s.get("AuthId", "") for s in server_opts]
     assert vol_opts == {}
+
+
+@pytest.mark.asyncio
+async def test_custom_user_options():
+    spawner = D4ScienceSpawner(_mock=True)
+    user_options = MagicMock()
+    spawner.custom_user_options = user_options
+    await spawner.load_user_options()
+    user_options.assert_called_once_with(spawner)
