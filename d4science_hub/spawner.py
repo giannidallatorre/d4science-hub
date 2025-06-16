@@ -5,31 +5,6 @@ from traitlets import Bool, Dict, List, Unicode
 
 
 class D4ScienceSpawner(KubeSpawner):
-    frame_ancestors = Unicode(
-        "https://*.d4science.org 'self'",
-        config=True,
-        help="""Frame ancestors for embedding the hub in d4science""",
-    )
-    use_ophidia = Bool(
-        True,
-        config=True,
-        help="""Whether to enable or not the ophidia setup""",
-    )
-    ophidia_image = Unicode(
-        "ophidiabigdata/ophidia-backend-hub:v1.1",
-        config=True,
-        help="""Ophidia image""",
-    )
-    ophidia_user = Unicode(
-        "oph-test",
-        config=True,
-        help="""Ophidia user""",
-    )
-    ophidia_passwd = Unicode(
-        "abcd",
-        config=True,
-        help="""Ophidia password""",
-    )
     workspace_security_context = Dict(
         {
             "capabilities": {"add": ["SYS_ADMIN"]},
@@ -282,25 +257,6 @@ class D4ScienceSpawner(KubeSpawner):
         self.log.debug("Profiles: %s", sorted_profiles)
         return sorted_profiles
 
-    def _configure_ophidia(self, spawner):
-        if not self.use_ophidia:
-            return
-        chosen_profile = spawner.user_options.get("profile", "")
-        if "ophidia" in chosen_profile:
-            ophidia_mounts = [
-                m for m in spawner.volume_mounts if m["name"] != "workspace"
-            ]
-            ophidia = {
-                "name": "ophidia",
-                "image": self.ophidia_image,
-                "volumeMounts": ophidia_mounts,
-            }
-            spawner.extra_containers.append(ophidia)
-            spawner.environment["OPH_USER"] = self.ophidia_user
-            spawner.environment["OPH_PASSWD"] = self.ophidia_passwd
-            spawner.environment["OPH_SERVER_HOST"] = "127.0.0.1"
-            spawner.environment["HDF5_USE_FILE_LOCKING"] = "FALSE"
-
     def _configure_workspace(self, spawner):
         token = spawner.environment.get("D4SCIENCE_TOKEN", "")
         if not token:
@@ -340,4 +296,3 @@ class D4ScienceSpawner(KubeSpawner):
         # TODO(enolfc): check whether assigning to [] is safe
         spawner.extra_containers = []
         self._configure_workspace(spawner)
-        self._configure_ophidia(spawner)
