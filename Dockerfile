@@ -12,6 +12,9 @@ COPY . /d4science-hub/
 # hadolint ignore=DL3013
 RUN pip3 install --no-cache-dir /d4science-hub
 
+# Copy images to the right place so they are found when referenced
+RUN cp -r /d4science-hub/static/* /usr/local/share/jupyterhub/static/
+
 HEALTHCHECK --interval=5m --timeout=3s \
   CMD curl -f http://localhost:8000/hub/health || exit 1
 
