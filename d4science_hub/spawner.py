@@ -39,7 +39,44 @@ class D4ScienceSpawner(KubeSpawner):
             """,
     )
     extra_profiles = List(
-        [],
+        [
+                {
+                    "display_name": "WITOIL",
+                    "description": "WITOIL environment (clone-wars)",
+                    "slug": "clone_wars",
+                    "kubespawner_override": {
+                        "image": "pokapok/clone_wars:latest",
+                        "command": ["/app/launchers/start-app.sh"],
+                        "volumes": [
+                            {
+                                "name": "data-space",
+                                "persistentVolumeClaim": {"claimName": "blue-cloud-dataspace"},
+                            },
+                            {
+                                "name": "user-data",
+                                "persistentVolumeClaim": {"claimName": "claim-{username}"},
+                            },
+                        ],
+                        "volume_mounts": [
+                            {
+                                "name": "data-space",
+                                "mountPath": "/runtime/data",
+                                "subPath": "clone-wars-data",
+                            },
+                            {
+                                "name": "data-space",
+                                "mountPath": "/runtime/log",
+                                "subPath": "clone-wars-logs",
+                            },
+                            {
+                                "name": "user-data",
+                                "mountPath": "/runtime/user-data",
+                            },
+                        ],
+                    },
+                    "default": False,
+                }
+        ],
         config=True,
         help="""Extra profiles to add to user options independently of the configuration
                 from the D4Science Information System. The profiles should be a list of
