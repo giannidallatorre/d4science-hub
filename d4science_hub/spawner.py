@@ -154,11 +154,18 @@ class D4ScienceSpawner(KubeSpawner):
                 profile = opt.get("Profile", {})
                 p = profile.get("Body", {})
                 if p.get("ServerOption", None):
-                    # Check roles
-                    role = p["ServerOption"].get("@role", "")
-                    if role and role not in roles:
+                    # Check roles. @role may be a single role, a comma
+                    # separated list of roles, or a list of roles.
+                    required_roles = p["ServerOption"].get("@role", "")
+                    if isinstance(required_roles, str):
+                        required_roles = [
+                            r.strip() for r in required_roles.split(",") if r.strip()
+                        ]
+                    if required_roles and not set(required_roles) & set(roles):
                         self.log.debug(
-                            f"ServerOption role {role} not in users roles, discarding"
+                            "ServerOption requires one of %s, user has %s, discarding",
+                            required_roles,
+                            roles,
                         )
                         continue
                     name = profile.get("Name", "")

@@ -52,6 +52,47 @@ async def test_build_options_role():
 
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "role_value",
+    [
+        "foo-role, bar-role",
+        ["foo-role", "bar-role"],
+    ],
+)
+async def test_build_options_multiple_roles(role_value):
+    spawner = D4ScienceSpawner(_mock=True)
+    resources = {
+        "genericResources": {
+            "Resource": [
+                {
+                    "Profile": {
+                        "Name": "ServerOption",
+                        "Body": {
+                            "ServerOption": {
+                                "AuthId": "witoil-authid",
+                                "Info": {
+                                    "Name": "WITOIL Option",
+                                    "Description": "desc",
+                                },
+                                "@role": role_value,
+                            }
+                        },
+                    }
+                }
+            ]
+        }
+    }
+
+    # the user has one of the required roles
+    server_opts, _ = spawner.build_resource_options(["bar-role"], resources)
+    assert "witoil-authid" in [s.get("AuthId", "") for s in server_opts]
+
+    # the user has none of the required roles
+    server_opts, _ = spawner.build_resource_options(["other-role"], resources)
+    assert "witoil-authid" not in [s.get("AuthId", "") for s in server_opts]
+
+
+@pytest.mark.asyncio
 async def test_custom_user_options():
     spawner = D4ScienceSpawner(_mock=True)
     user_options = mock.MagicMock()
