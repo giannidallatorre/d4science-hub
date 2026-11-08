@@ -21,6 +21,16 @@ jobs:
           # This is needed for PBR get the right version
           fetch-depth: 0
           persist-credentials: false
+      # 'act' exports ACT=true in the container. Detect it so that local runs
+      # build the image without logging in or pushing to the registry.
+      - name: Detect local run
+        id: local
+        run: |
+          if [ -n "${ACT:-}" ]; then
+            echo "act=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "act=false" >> "$GITHUB_OUTPUT"
+          fi
       - name: Docker meta
         id: docker_meta
         uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302
@@ -40,11 +50,12 @@ jobs:
           registry: harbor.d4science.org
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && steps.local.outputs.act != 'true'
       - name: Build
         uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc
         with:
-          push: ${{ github.event_name != 'pull_request' }}
+          push: ${{ github.event_name != 'pull_request' && steps.local.outputs.act != 'true' }}
+          load: ${{ steps.local.outputs.act == 'true' }}
           tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}
           context: .
